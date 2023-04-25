@@ -160,17 +160,18 @@ class Icon extends Component {
         x: -0.5,
         y: -0.5,
         cursorStyle: 'pointer',
+        mouseUpHandler: this.deleteObject,
         render: this.renderIcon(deleteImg),
         cornerSize: 60,
       });
 
-      icon.controls.editControl = new fabric.Control({
-        x: 0.5,
-        y: -0.5,
-        cursorStyle: 'pointer',
-        render: this.renderIcon(editImg),
-        cornerSize: 60,
-      });
+      // icon.controls.editControl = new fabric.Control({
+      //   x: 0.5,
+      //   y: -0.5,
+      //   cursorStyle: 'pointer',
+      //   render: this.renderIcon(editImg),
+      //   cornerSize: 60,
+      // });
 
       icon.controls.rotateControl = new fabric.Control({
         x: -0.5,
@@ -193,6 +194,13 @@ class Icon extends Component {
       ctx.drawImage(icon, -size / 2, -size / 2, size, size);
       ctx.restore();
     };
+  }
+
+  deleteObject(eventData, transform) {
+    const targetEvent = transform.target;
+    const canvasEvent = targetEvent.canvas;
+    canvasEvent.remove(targetEvent);
+    canvasEvent.requestRenderAll();
   }
 
   /**
