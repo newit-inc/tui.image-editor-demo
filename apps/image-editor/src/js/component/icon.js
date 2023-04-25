@@ -129,8 +129,70 @@ class Icon extends Component {
 
       canvas.add(icon).setActiveObject(icon);
 
+      // Set the visibility of the controls for the icon object
+      icon.setControlsVisibility({
+        mtr: false, // Hide rotate point
+        ml: false, // Hide middle-left point
+        mr: false, // Hide middle-right point
+        mt: false, // Hide middle-top corner
+        mb: false, // Hide middle-bottom corner
+        tl: false,
+      });
+
+      const rotateImg = document.createElement('img');
+      rotateImg.src = `/img/rotate.png`;
+      const deleteImg = document.createElement('img');
+      deleteImg.src = `/img/delete.png`;
+      const editImg = document.createElement('img');
+      editImg.src = `/img/edit.png`;
+      const resizeImg = document.createElement('img');
+      resizeImg.src = `/img/resize.png`;
+
+      icon.controls.resizeControl = new fabric.Control({
+        x: 0.5,
+        y: 0.5,
+        cursorStyle: 'pointer',
+        render: this.renderIcon(resizeImg),
+        cornerSize: 60,
+      });
+
+      icon.controls.deleteControl = new fabric.Control({
+        x: -0.5,
+        y: -0.5,
+        cursorStyle: 'pointer',
+        render: this.renderIcon(deleteImg),
+        cornerSize: 60,
+      });
+
+      icon.controls.editControl = new fabric.Control({
+        x: 0.5,
+        y: -0.5,
+        cursorStyle: 'pointer',
+        render: this.renderIcon(editImg),
+        cornerSize: 60,
+      });
+
+      icon.controls.rotateControl = new fabric.Control({
+        x: -0.5,
+        y: 0.5,
+        cursorStyle: 'pointer',
+        render: this.renderIcon(rotateImg),
+        cornerSize: 60,
+      });
+
       resolve(this.graphics.createObjectProperties(icon));
     });
+  }
+
+  renderIcon(icon) {
+    return function renderIcon(ctx, left, top, styleOverride, fabricObject) {
+      const size = this.cornerSize;
+      ctx.save();
+      ctx.translate(left, top);
+      ctx.rotate(fabric.util.degreesToRadians(fabricObject.angle));
+      ctx.drawImage(icon, -size / 2, -size / 2, size, size);
+      ctx.restore();
+    };
   }
 
   /**
