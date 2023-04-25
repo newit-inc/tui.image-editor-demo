@@ -136,7 +136,7 @@ class Icon extends Component {
         mr: false, // Hide middle-right point
         mt: false, // Hide middle-top corner
         mb: false, // Hide middle-bottom corner
-        tl: false,
+        tr: false,
       });
 
       const rotateImg = document.createElement('img');
