@@ -149,10 +149,10 @@ class Icon extends Component {
       editImg.src = `../examples/img/edit.png`;
       resizeImg.src = `../examples/img/resize.png`;
 
-      rotateImg.src = `/img/rotate.png`;
-      deleteImg.src = `/img/delete.png`;
-      editImg.src = `/img/edit.png`;
-      resizeImg.src = `/img/resize.png`;
+      // rotateImg.src = `/img/rotate.png`;
+      // deleteImg.src = `/img/delete.png`;
+      // editImg.src = `/img/edit.png`;
+      // resizeImg.src = `/img/resize.png`;
 
       icon.controls.resizeControl = new fabric.Control({
         x: 0.5,
