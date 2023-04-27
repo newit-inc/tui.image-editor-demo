@@ -53767,7 +53767,35 @@ var icon_Icon = /*#__PURE__*/function (_Component) {
           y: 0.5,
           cursorStyle: 'pointer',
           render: _this2.renderIcon(resizeImg),
-          cornerSize: 60
+          cornerSize: 60,
+          mouseUpHandler: function mouseUpHandler(event, transform) {
+            delete transform.target._lastSx;
+            delete transform.target._lastSy;
+          },
+          mouseDownHandler: function mouseDownHandler(event, transform, x, y) {
+            transform.target._lastSx = x;
+            transform.target._lastSy = y;
+          },
+          actionHandler: function actionHandler(eventData, transform, x, y) {
+            var targetEvent = transform.target;
+            var center = targetEvent.getCenterPoint();
+
+            var moveOriginPointer = _this2.convertPointAxis(center, targetEvent.angle, {
+              x: x,
+              y: y
+            });
+
+            var scaleX = moveOriginPointer.x / icon.width;
+            var scaleY = moveOriginPointer.y / icon.height;
+            transform.target._lastSx = x;
+            transform.target._lastSy = y;
+            icon.set({
+              scaleX: Math.abs(scaleX * 2),
+              scaleY: Math.abs(scaleY * 2)
+            });
+            icon.setCoords();
+            canvas.renderAll();
+          }
         });
         icon.controls.deleteControl = new fabric.fabric.Control({
           x: -0.5,
@@ -53776,23 +53804,90 @@ var icon_Icon = /*#__PURE__*/function (_Component) {
           mouseUpHandler: _this2.deleteObject,
           render: _this2.renderIcon(deleteImg),
           cornerSize: 60
-        }); // icon.controls.editControl = new fabric.Control({
-        //   x: 0.5,
-        //   y: -0.5,
-        //   cursorStyle: 'pointer',
-        //   render: this.renderIcon(editImg),
-        //   cornerSize: 60,
-        // });
-
+        });
         icon.controls.rotateControl = new fabric.fabric.Control({
           x: -0.5,
           y: 0.5,
           cursorStyle: 'pointer',
           render: _this2.renderIcon(rotateImg),
-          cornerSize: 60
+          mouseUpHandler: function mouseUpHandler(event, transform) {
+            delete transform.target._lastRx;
+            delete transform.target._lastRy;
+          },
+          mouseDownHandler: function mouseDownHandler(event, transform, x, y) {
+            transform.target._lastRx = x;
+            transform.target._lastRy = y;
+          },
+          cornerSize: 60,
+          actionHandler: function actionHandler(event, transform, x, y) {
+            var _targetEvent$_lastRx, _targetEvent$_lastRy;
+
+            var targetEvent = transform.target; // Center
+
+            var center = targetEvent.getCenterPoint();
+
+            var additionAngle = _this2.findAngle({
+              x: (_targetEvent$_lastRx = targetEvent._lastRx) !== null && _targetEvent$_lastRx !== void 0 ? _targetEvent$_lastRx : x,
+              y: (_targetEvent$_lastRy = targetEvent._lastRy) !== null && _targetEvent$_lastRy !== void 0 ? _targetEvent$_lastRy : y
+            }, {
+              x: center.x,
+              y: center.y
+            }, {
+              x: x,
+              y: y
+            });
+
+            var oldAngle = targetEvent.angle;
+            targetEvent._lastRx = x;
+            targetEvent._lastRy = y;
+            targetEvent.rotate((oldAngle + additionAngle) % 360);
+            canvas.renderAll();
+          }
         });
         resolve(_this2.graphics.createObjectProperties(icon));
       });
+    }
+    /*
+     * Calculates the angle BAC (in radians)
+     *
+     * B first point, ex: {x: 0, y: 0}
+     * C second point
+     * A center point
+     */
+
+  }, {
+    key: "findAngle",
+    value: function findAngle(B, A, C) {
+      var AB = {
+        x: A.x - B.x,
+        y: A.y - B.y
+      };
+      var AC = {
+        x: A.x - C.x,
+        y: A.y - C.y
+      };
+      var result = (Math.atan2(AB.x * AC.x + AB.y * AC.y, AB.y * AC.x - AB.x * AC.y) * 180 / Math.PI - 90) % 360;
+      return result;
+    }
+  }, {
+    key: "convertPointAxis",
+    value: function convertPointAxis(Center, Angle, A) {
+      var alpha = Angle / 360.0;
+      var B = {
+        x: 0,
+        y: 0
+      };
+
+      if (Math.tan(alpha) === 0) {
+        B.x = A.x - Center.x;
+        B.y = A.y - Center.y;
+      } else {
+        B.y = Math.sin(alpha) * (A.x - Center.x + (A.y - Center.y) / Math.tan(alpha));
+        B.x = Math.cos(alpha) * (A.x - Center.x - Math.tan(alpha) * (A.y - Center.y));
+      }
+
+      console.log('convertPointAxis', Angle, Center, A, B);
+      return B;
     }
   }, {
     key: "renderIcon",
